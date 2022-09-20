@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 using System.Xml;
-using UnityEngine.SceneManagement;
 
 // This software has been further expanded by Alen Smajic (2020).
 

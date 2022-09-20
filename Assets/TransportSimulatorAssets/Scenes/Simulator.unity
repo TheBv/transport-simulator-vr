@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.5930829, g: 0.6235407, b: 0.67890936, a: 1}
+  m_IndirectSpecularColor: {r: 0.593051, g: 0.6235358, b: 0.67881197, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2920,6 +2920,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
@@ -8158,7 +8159,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ServerIp: 127.0.0.1
   ServerPort: 7777
-  osmMapDataFilePath: /Users/peinz/Desktop/map_small.txt
+  osmMapDataFilePath: {fileID: 4900000, guid: e9fcbb90c44fd414b92136e0e7de2650, type: 3}
   Lobby: {fileID: 1595106007}
   mapBuilder: {fileID: 1465030156}
   MapboxMapGameObject: {fileID: 1653818058}
@@ -11848,7 +11849,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcaf71036ec4b234eab5b773e1914323, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MapboxMapGameObject: {fileID: 1653818058}
 --- !u!4 &1465030159
 Transform:
   m_ObjectHideFlags: 0
@@ -20373,6 +20373,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: -2024308242397127297, guid: c348712bda248c246b8c49b3db54643f,
       type: 3}
   m_RotationAction:
@@ -20385,6 +20386,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: 8248158260566104461, guid: c348712bda248c246b8c49b3db54643f,
       type: 3}
   m_SelectAction:
@@ -20397,6 +20399,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: -8244684196171339455, guid: 46ce647826c99e94f980c3bc776e7578,
       type: 3}
   m_ActivateAction:
@@ -20409,6 +20412,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: 4703839542739701177, guid: 46ce647826c99e94f980c3bc776e7578,
       type: 3}
   m_UIPressAction:
@@ -20421,6 +20425,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: 1452750610865193242, guid: 46ce647826c99e94f980c3bc776e7578,
       type: 3}
   m_HapticDeviceAction:
@@ -20433,6 +20438,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: -5761959911926125022, guid: 46ce647826c99e94f980c3bc776e7578,
       type: 3}
   m_RotateAnchorAction:
@@ -20445,6 +20451,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: -4993316167254935973, guid: 46ce647826c99e94f980c3bc776e7578,
       type: 3}
   m_TranslateAnchorAction:
@@ -20457,6 +20464,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: 6762167163630899978, guid: 46ce647826c99e94f980c3bc776e7578,
       type: 3}
   m_ButtonPressPoint: 0.5
@@ -21065,6 +21073,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: 0}
   m_RotationAction:
     m_UseReference: 0
@@ -21076,6 +21085,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: 0}
   m_SelectAction:
     m_UseReference: 1
@@ -21087,6 +21097,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: 4966789294658371126, guid: 46ce647826c99e94f980c3bc776e7578,
       type: 3}
   m_ActivateAction:
@@ -21099,6 +21110,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: 4703839542739701177, guid: 46ce647826c99e94f980c3bc776e7578,
       type: 3}
   m_UIPressAction:
@@ -21111,6 +21123,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: 1452750610865193242, guid: 46ce647826c99e94f980c3bc776e7578,
       type: 3}
   m_HapticDeviceAction:
@@ -21123,6 +21136,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: -5761959911926125022, guid: 46ce647826c99e94f980c3bc776e7578,
       type: 3}
   m_SwitchInteractionModeAction:
@@ -21135,6 +21149,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: 6762167163630899978, guid: 46ce647826c99e94f980c3bc776e7578,
       type: 3}
   m_InteractionAxisAction:
@@ -21147,6 +21162,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: -4993316167254935973, guid: 46ce647826c99e94f980c3bc776e7578,
       type: 3}
   m_ButtonPressPoint: 0.5
@@ -21172,6 +21188,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
@@ -21284,6 +21301,46 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TrackingType: 0
   m_UpdateType: 0
+  m_PositionInput:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Main Camera - TPD - Position
+      m_Type: 0
+      m_ExpectedControlType: Vector3
+      m_Id: b7b0026c-9ee6-4e8f-b923-3cb6c3cb8335
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: 11a53ad8-87c4-4a7c-90f4-743342f202ce
+        m_Path: <XRHMD>/centerEyePosition
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Main Camera - TPD - Position
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  m_RotationInput:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Main Camera - TPD - Rotation
+      m_Type: 0
+      m_ExpectedControlType: Quaternion
+      m_Id: 92564478-7b4f-4b91-86d9-b655fbd4c282
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: bbf78c1b-0038-4164-9c0a-77489e7fad06
+        m_Path: <XRHMD>/centerEyeRotation
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Main Camera - TPD - Rotation
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
   m_PositionAction:
     m_Name: Main Camera - TPD - Position
     m_Type: 0
@@ -21300,6 +21357,7 @@ MonoBehaviour:
       m_Groups: 
       m_Action: Main Camera - TPD - Position
       m_Flags: 0
+    m_Flags: 0
   m_RotationAction:
     m_Name: Main Camera - TPD - Rotation
     m_Type: 0
@@ -21316,6 +21374,8 @@ MonoBehaviour:
       m_Groups: 
       m_Action: Main Camera - TPD - Rotation
       m_Flags: 0
+    m_Flags: 0
+  m_HasMigratedActions: 1
 --- !u!81 &5663732224598888879
 AudioListener:
   m_ObjectHideFlags: 0
@@ -21583,6 +21643,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: -1101711432596910331, guid: 46ce647826c99e94f980c3bc776e7578,
       type: 3}
   m_RightHandMoveAction:
@@ -21595,6 +21656,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
+      m_Flags: 0
     m_Reference: {fileID: 0}
 --- !u!4 &5663732225245233494
 Transform:
