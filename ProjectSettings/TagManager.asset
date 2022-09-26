@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Menu
   - StationUI
+  - Teleport
   layers:
   - Default
   - TransparentFX
@@ -37,7 +38,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - ignoreGroundRaycast
   - teleport
   m_SortingLayers:
   - name: Default

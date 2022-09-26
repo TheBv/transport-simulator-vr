@@ -12,6 +12,27 @@ PrefabInstance:
       propertyPath: m_Name
       value: Train Wagon
       objectReference: {fileID: 0}
+    - target: {fileID: 8044003942047853933, guid: 247a1b0f7acf17446835383ad8ce24a4,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 6745704031616539817, guid: 406081d7ebf9e6f4691ae5ab7f1361d0,
+        type: 3}
+    - target: {fileID: 8044003942047853933, guid: 247a1b0f7acf17446835383ad8ce24a4,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100002, guid: efe9381559c516743bd05cef82f39ebb, type: 3}
+    - target: {fileID: 8044003942047853933, guid: 247a1b0f7acf17446835383ad8ce24a4,
+        type: 3}
+      propertyPath: m_Materials.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100002, guid: ff6dc36862fe41641bb21568d92147c9, type: 3}
+    - target: {fileID: 8044003942047853933, guid: 247a1b0f7acf17446835383ad8ce24a4,
+        type: 3}
+      propertyPath: m_Materials.Array.data[4]
+      value: 
+      objectReference: {fileID: 2100000, guid: b4da84c5c49be450c8502c76826ffc3f, type: 2}
     - target: {fileID: 9180611162403237777, guid: 247a1b0f7acf17446835383ad8ce24a4,
         type: 3}
       propertyPath: m_RootOrder
