@@ -26,7 +26,7 @@ namespace Ubiq.XR
 
         private new LineRenderer renderer;
 
-        private readonly float range = 8f;
+        private readonly float range = 20f;
         private readonly float curve = 20f;
         private readonly int segments = 50;
 
