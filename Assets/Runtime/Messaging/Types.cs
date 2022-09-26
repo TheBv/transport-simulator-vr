@@ -17,6 +17,19 @@ namespace Ubiq.Messaging
             this.rotation = transform.localRotation;
         }
     }
+    [Serializable]
+    public struct RigidBodyMessage
+    {
+        public bool kinematic;
+
+        public Vector3 velocity;
+
+        public RigidBodyMessage(Rigidbody body) {
+            this.kinematic = body.isKinematic;
+            this.velocity = body.velocity;
+        }
+        
+    } 
 
 
 }

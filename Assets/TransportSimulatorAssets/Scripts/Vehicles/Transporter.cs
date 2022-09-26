@@ -18,7 +18,8 @@ namespace Vehicle {
 
         private void OnTriggerEnter(Collider other)
         {
-            objectToTransport = other.gameObject;
+            if (other.gameObject.CompareTag("Player"))
+                objectToTransport = other.gameObject;
         }
         public void StopTransporting()
         {

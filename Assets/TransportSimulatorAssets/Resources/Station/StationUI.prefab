@@ -944,6 +944,7 @@ GameObject:
   - component: {fileID: 1144496009302736184}
   - component: {fileID: 1506083387408355584}
   - component: {fileID: 3809058340820395448}
+  - component: {fileID: 4129758005526961299}
   m_Layer: 5
   m_Name: 'Dropdown '
   m_TagString: Untagged
@@ -1094,6 +1095,18 @@ MonoBehaviour:
   SearchResultsDropdown: {fileID: 0}
   SearchInput: {fileID: 0}
   Camera: {fileID: 0}
+--- !u!114 &4129758005526961299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6834465258107364124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cbd4f5d5609ca4595310fdfa657e63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7191046848742822110
 GameObject:
   m_ObjectHideFlags: 0
@@ -1108,6 +1121,7 @@ GameObject:
   - component: {fileID: 4238867201284138272}
   - component: {fileID: 4878135390434690489}
   - component: {fileID: 7191046848742822105}
+  - component: {fileID: 85114362749673622}
   m_Layer: 5
   m_Name: StationUI
   m_TagString: StationUI
@@ -1147,7 +1161,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7191046848742822110}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 2
   m_Camera: {fileID: 0}
@@ -1183,7 +1197,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &4238867201284138272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1236,6 +1250,18 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RaycastTriggerInteraction: 1
+--- !u!114 &85114362749673622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7191046848742822110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cbd4f5d5609ca4595310fdfa657e63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7331558180672291354
 GameObject:
   m_ObjectHideFlags: 0
@@ -1327,6 +1353,7 @@ GameObject:
   - component: {fileID: 1314962339783448295}
   - component: {fileID: 8277210451073404769}
   - component: {fileID: 8950997177144384075}
+  - component: {fileID: 5581594413570676196}
   m_Layer: 5
   m_Name: Template
   m_TagString: Untagged
@@ -1423,6 +1450,18 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &5581594413570676196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7971982286151079887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cbd4f5d5609ca4595310fdfa657e63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8527356568937455531
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
-
+using UnityEngine;
 // This software has been further expanded by Alen Smajic (2020).
 
 /*
@@ -46,7 +46,7 @@ class MapReader
         nodes = new Dictionary<ulong, OsmNode>();
         ways = new Dictionary<ulong, OsmWay>();
         relations = new List<OsmRelation>();
-
+        var time = Time.realtimeSinceStartup;
         XmlDocument doc = new XmlDocument();
         try
         {
@@ -67,7 +67,6 @@ class MapReader
             {
                 GetRelations(doc.SelectNodes("/osm/relation"));
             }
-
             return new OsmData(bounds, nodes, ways, relations);
         }
 

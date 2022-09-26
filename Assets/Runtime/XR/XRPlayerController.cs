@@ -74,10 +74,9 @@ namespace Ubiq.XR
             var direction = Vector3.down;
 
             RaycastHit hitInfo;
-            if(Physics.Raycast(new Ray(origin, direction), out hitInfo))
+            if(Physics.Raycast(new Ray(origin, direction), out hitInfo, Mathf.Infinity, ~(1 << LayerMask.NameToLayer("ignoreGroundRaycast"))))
             {
                 var virtualFloorHeight = hitInfo.point.y;
-
                 if (transform.position.y < virtualFloorHeight)
                 {
                     transform.position += Vector3.up * (virtualFloorHeight - transform.position.y) * Time.deltaTime * 3f;
@@ -132,6 +131,7 @@ namespace Ubiq.XR
             userLocalPosition.x += (headProjectionXZ.x - userLocalPosition.x) * Time.deltaTime * cameraRubberBand.Evaluate(Mathf.Abs(headProjectionXZ.x - userLocalPosition.x));
             userLocalPosition.z += (headProjectionXZ.z - userLocalPosition.z) * Time.deltaTime * cameraRubberBand.Evaluate(Mathf.Abs(headProjectionXZ.z - userLocalPosition.z));
             userLocalPosition.y = 0;
+            OnGround();
         }
 
         private void OnDrawGizmos()

@@ -49,7 +49,7 @@ class MapBuilder : MonoBehaviour
     public Material light_rails;
     public static Material selected_way;
 
-    Material inUse; 
+    Material inUse;
 
     bool StationsCreated = false;
 
@@ -68,73 +68,60 @@ class MapBuilder : MonoBehaviour
         this.osmData = osmData;
 
         if (!UserPreferences.Stations)
-        { 
+        {
             StationsCreated = true;
         }
         else
         {
-            StationBuilder(); // Stations are being built.
+            for (int i = 0; i < osmData.Relations.Count; i++)
+            {
+                switch (osmData.Relations[i].TransportType)
+                {
+                    case "subway":
+                        if (UserPreferences.Subways == true)
+                        {
+                            CreateStations(osmData.Relations[i]);
+                        }
+                        break;
+                    case "tram":
+                        if (UserPreferences.Trams == true)
+                        {
+                            CreateStations(osmData.Relations[i]);
+                        }
+                        break;
+                    case "train":
+                        if (UserPreferences.Trains == true)
+                        {
+                            CreateStations(osmData.Relations[i]);
+                        }
+                        break;
+                    case "railway":
+                        if (UserPreferences.Railways == true)
+                        {
+                            CreateStations(osmData.Relations[i]);
+                        }
+                        break;
+                    case "light_rail":
+                        if (UserPreferences.LightRails == true)
+                        {
+                            CreateStations(osmData.Relations[i]);
+                        }
+                        break;
+                    case "bus":
+                        if (UserPreferences.Busses == true)
+                        {
+                            CreateStations(osmData.Relations[i]);
+                        }
+                        break;
+                }
+                yield return null;
+            }
         }
 
-        while (!StationsCreated)
-        {
-            yield return null;
-        }
-
-        if(UserPreferences.PublicTransportRailways || UserPreferences.PublicTransportStreets)
+        if (UserPreferences.PublicTransportRailways || UserPreferences.PublicTransportStreets)
         {
             StartCoroutine(WayBuilder()); // Roads and railroads are being instantiated.
         }
-    }
-
-    /// <summary>
-    /// We iterate over all relation instances to generate the station objects.
-    /// </summary>
-    void StationBuilder()
-    {
-        for(int i=0; i<osmData.Relations.Count; i++)
-        {
-            switch (osmData.Relations[i].TransportType)
-            {
-                case "subway":
-                    if (UserPreferences.Subways == true)
-                    {
-                        CreateStations(osmData.Relations[i]);
-                    }
-                    break;
-                case "tram":
-                    if (UserPreferences.Trams == true)
-                    {
-                        CreateStations(osmData.Relations[i]);
-                    }
-                    break;
-                case "train":
-                    if (UserPreferences.Trains == true)
-                    {
-                        CreateStations(osmData.Relations[i]);
-                    }
-                    break;
-                case "railway":
-                    if (UserPreferences.Railways == true)
-                    {
-                        CreateStations(osmData.Relations[i]);
-                    }
-                    break;
-                case "light_rail":
-                    if (UserPreferences.LightRails == true)
-                    {
-                        CreateStations(osmData.Relations[i]);
-                    }
-                    break;
-                case "bus":
-                    if (UserPreferences.Busses == true)
-                    {
-                        CreateStations(osmData.Relations[i]);
-                    }
-                    break;
-            }
-        }
-        StationsCreated = true;
     }
 
     /// <summary>
@@ -143,7 +130,7 @@ class MapBuilder : MonoBehaviour
     /// </summary>
     /// <param name="r">relation instance</param>
     void CreateStations(OsmRelation r)
-    {       
+    {
         foreach (ulong NodeID in r.StoppingNodeIDs)
         {
             GameObject station_object;
@@ -164,7 +151,7 @@ class MapBuilder : MonoBehaviour
                     // already been generated at the certain point.
                     for (int i = 5; i < allObjects.Count; i++)
                     {
-                        if(allObjects[i].transform.position == osmData.Nodes[NodeID] - osmData.Bounds.Centre)
+                        if (allObjects[i].transform.position == osmData.Nodes[NodeID] - osmData.Bounds.Centre)
                         {
                             bool doubleFound = false;
 
@@ -174,11 +161,11 @@ class MapBuilder : MonoBehaviour
                             // was stored multiple times. The reason for this is still unclear, this is a workaround.
                             GameObject Dropdown = allObjects[i].transform.GetChild(0).transform.GetChild(0).transform.GetChild(2).gameObject;
                             var dropOptions = Dropdown.GetComponent<Dropdown>();
-                            for(int j = 0; j < dropOptions.options.Count; j++)
+                            for (int j = 0; j < dropOptions.options.Count; j++)
                             {
-                                for(int k = 0; k < osmData.Nodes[NodeID].TransportLines.Count; k++)
+                                for (int k = 0; k < osmData.Nodes[NodeID].TransportLines.Count; k++)
                                 {
-                                    if(dropOptions.options[j].text == osmData.Nodes[NodeID].TransportLines[k])
+                                    if (dropOptions.options[j].text == osmData.Nodes[NodeID].TransportLines[k])
                                     {
                                         doubleFound = true;
                                         continue;
@@ -230,7 +217,7 @@ class MapBuilder : MonoBehaviour
                 var dropDownOptions = TransportLineDropdown.GetComponent<Dropdown>();
                 dropDownOptions.AddOptions(osmData.Nodes[NodeID].TransportLines);
 
-                if(r.TransportType == "bus")
+                if (r.TransportType == "bus")
                 {
                     // Activates the bus symbol on the UI.
                     stationUI_object.transform.GetChild(4).gameObject.SetActive(true);
@@ -267,9 +254,9 @@ class MapBuilder : MonoBehaviour
             processed_items += 1;
             float loadingPercentage = processed_items / TargetCount * 100;
 
-            if(loadingPercentage < 99) 
+            if (loadingPercentage < 99)
             {
-                if(loadingPercentage > percentageAmount)
+                if (loadingPercentage > percentageAmount)
                 {
                     percentageAmount += 1;
                     PercentageDisplayer.text = percentageAmount.ToString() + "%";
@@ -284,7 +271,8 @@ class MapBuilder : MonoBehaviour
 
             if (w.Value.PublicTransportStreet && !UserPreferences.PublicTransportStreets) continue;
             if (w.Value.PublicTransportRailway && !UserPreferences.PublicTransportRailways) continue;
-            if (w.Value.PublicTransportRailway){
+            if (w.Value.PublicTransportRailway)
+            {
                 if (w.Value.TransportTypes.Contains("subway") && !UserPreferences.Subways) continue;
                 if (w.Value.TransportTypes.Contains("tram") && !UserPreferences.Trams) continue;
                 if (w.Value.TransportTypes.Contains("train") && !UserPreferences.Trains) continue;
@@ -293,37 +281,47 @@ class MapBuilder : MonoBehaviour
             }
 
             // Here we start the process of road/rail road instantiation.
-            if (w.Value.PublicTransportStreet) {
+            if (w.Value.PublicTransportStreet)
+            {
                 inUse = bus_streets;
             }
-            else if (w.Value.PublicTransportRailway) {
+            else if (w.Value.PublicTransportRailway)
+            {
 
-                if(!UserPreferences.Subways && !UserPreferences.Trams && !UserPreferences.Trains && !UserPreferences.Railways && !UserPreferences.LightRails) {
+                if (!UserPreferences.Subways && !UserPreferences.Trams && !UserPreferences.Trains && !UserPreferences.Railways && !UserPreferences.LightRails)
+                {
                     inUse = public_transport_railways;
                 }
-                else if (w.Value.TransportTypes.Contains("subway")) {
+                else if (w.Value.TransportTypes.Contains("subway"))
+                {
                     inUse = subways;
                 }
-                else if (w.Value.TransportTypes.Contains("tram")) {
+                else if (w.Value.TransportTypes.Contains("tram"))
+                {
                     inUse = trams;
                 }
-                else if (w.Value.TransportTypes.Contains("train")) {
+                else if (w.Value.TransportTypes.Contains("train"))
+                {
                     inUse = trains;
                 }
-                else if (w.Value.TransportTypes.Contains("railway")) {
+                else if (w.Value.TransportTypes.Contains("railway"))
+                {
                     inUse = railway;
                 }
-                else if (w.Value.TransportTypes.Contains("light_rail")) {
+                else if (w.Value.TransportTypes.Contains("light_rail"))
+                {
                     inUse = light_rails;
                 }
-                else {
+                else
+                {
                     continue;
                 }
             }
-            else {
+            else
+            {
                 continue;
             }
-                                             
+
             GameObject go = new GameObject();
             var waytext = go.AddComponent<Text>();
             foreach (string tramline in w.Value.TransportLines)
@@ -331,7 +329,7 @@ class MapBuilder : MonoBehaviour
                 waytext.text += tramline + ", ";
             }
             Vector3 localOrigin = GetCentre(w.Value);
-            go.transform.position = (localOrigin - osmData.Bounds.Centre) + Vector3.up*10;
+            go.transform.position = (localOrigin - osmData.Bounds.Centre) + Vector3.up * 10;
 
 
             MeshFilter mf = go.AddComponent<MeshFilter>();
@@ -340,7 +338,7 @@ class MapBuilder : MonoBehaviour
             mr.material = inUse;
 
             // Here we store the vectors, normales and indexes.
-            List<Vector3> vectors = new List<Vector3>();  
+            List<Vector3> vectors = new List<Vector3>();
             List<Vector3> normals = new List<Vector3>();
             List<int> indicies = new List<int>();
 
@@ -349,25 +347,25 @@ class MapBuilder : MonoBehaviour
                 OsmNode p1 = osmData.Nodes[w.Value.NodeIDs[i - 1]];
                 OsmNode p2 = osmData.Nodes[w.Value.NodeIDs[i]];
 
-                Vector3 s1 = p1 - localOrigin;  
+                Vector3 s1 = p1 - localOrigin;
                 Vector3 s2 = p2 - localOrigin;
 
                 Vector3 diff = (s2 - s1).normalized;
 
                 // The width of road and railroads is set to 1 meter.
-                var cross = Vector3.Cross(diff, Vector3.up) * 1.0f; 
+                var cross = Vector3.Cross(diff, Vector3.up) * 1.0f;
 
                 Vector3 v1 = s1 + cross;
                 Vector3 v2 = s1 - cross;
                 Vector3 v3 = s2 + cross;
                 Vector3 v4 = s2 - cross;
 
-                vectors.Add(v1);  
+                vectors.Add(v1);
                 vectors.Add(v2);
                 vectors.Add(v3);
                 vectors.Add(v4);
 
-                normals.Add(Vector3.up);  
+                normals.Add(Vector3.up);
                 normals.Add(Vector3.up);
                 normals.Add(Vector3.up);
                 normals.Add(Vector3.up);
@@ -395,7 +393,7 @@ class MapBuilder : MonoBehaviour
 
             // Lastly we store the Unity coordinates of every generated way. This is then used later on
             // when we want to move the transport vehicles across the ways.
-            for(int i = 0; i < w.Value.NodeIDs.Count; i++)
+            for (int i = 0; i < w.Value.NodeIDs.Count; i++)
             {
                 OsmNode p1 = osmData.Nodes[w.Value.NodeIDs[i]];
                 w.Value.UnityCoordinates.Add(p1 - osmData.Bounds.Centre);
@@ -409,14 +407,14 @@ class MapBuilder : MonoBehaviour
     /// </summary>
     /// <param name="way">way instance</param>
     /// <returns></returns>
-    protected Vector3 GetCentre(OsmWay way)  
+    protected Vector3 GetCentre(OsmWay way)
     {
         Vector3 total = Vector3.zero;
 
         foreach (var id in way.NodeIDs)
         {
-            total += osmData.Nodes[id];  
+            total += osmData.Nodes[id];
         }
         return total / way.NodeIDs.Count;
-    }  
+    }
 }
