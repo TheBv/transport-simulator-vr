@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Xml;
 using UnityEngine;
+using System.Xml;
+using UnityEngine.SceneManagement;
+
 // This software has been further expanded by Alen Smajic (2020).
 
 /*
@@ -46,36 +48,18 @@ class MapReader
         nodes = new Dictionary<ulong, OsmNode>();
         ways = new Dictionary<ulong, OsmWay>();
         relations = new List<OsmRelation>();
-        var time = Time.realtimeSinceStartup;
-        XmlDocument doc = new XmlDocument();
-        try
-        {
-            // The XML file is being loaded and the data nodes are being extracted using
-            // the classes from the serialization folder.
-            // doc.Load(FileLoader.ResourceFilePath);
-            doc.Load(path);
-            SetBounds(doc.SelectSingleNode("/osm/bounds"));
-            if (UserPreferences.PublicTransportStreets || UserPreferences.PublicTransportRailways || UserPreferences.Stations)
-            {
-                GetNodes(doc.SelectNodes("/osm/node"));
-            }
-            if (UserPreferences.PublicTransportStreets || UserPreferences.PublicTransportRailways)
-            {
-                GetWays(doc.SelectNodes("/osm/way"));
-            }
-            if (UserPreferences.PublicTransportStreets || UserPreferences.PublicTransportRailways || UserPreferences.Stations)
-            {
-                GetRelations(doc.SelectNodes("/osm/relation"));
-            }
-            return new OsmData(bounds, nodes, ways, relations);
-        }
 
-        // If the user input path to the XML file is not in XML format, the user is
-        // being returned to the Main Menu with an error message.
-        catch
-        {
-            return null;
-        }
+        XmlDocument doc = new XmlDocument();
+        // The XML file is being loaded and the data nodes are being extracted using
+        // the classes from the serialization folder.
+        // doc.Load(FileLoader.ResourceFilePath);
+        doc.Load(path);
+        SetBounds(doc.SelectSingleNode("/osm/bounds"));
+        GetNodes(doc.SelectNodes("/osm/node"));
+        GetWays(doc.SelectNodes("/osm/way"));
+        GetRelations(doc.SelectNodes("/osm/relation"));
+
+        return new OsmData(bounds, nodes, ways, relations);
     }
 
     /// <summary>
@@ -115,17 +99,11 @@ class MapReader
 
             if (way.IsRailway == true)
             {
-                if (UserPreferences.PublicTransportRailways)
-                {
-                    ways[way.ID] = way;
-                }
+                ways[way.ID] = way;
             }
             else if (way.IsStreet == true)
             {
-                if (UserPreferences.PublicTransportStreets)
-                {
-                    ways[way.ID] = way;
-                }
+                ways[way.ID] = way;
             }
         }
     }
@@ -141,28 +119,21 @@ class MapReader
         {
             OsmRelation relation = new OsmRelation(node);
 
-            if (relation.Route == true)
+            if (relation.Route != null)
             {
                 relations.Add(relation);
 
-                if (UserPreferences.PublicTransportRailways || UserPreferences.PublicTransportStreets)
+                TagPublicTransportWays(relation);
+                foreach (ulong NodeID in relation.StoppingNodeIDs)
                 {
-                    TagPublicTransportWays(relation);
-                }
-
-                if (UserPreferences.Stations)
-                {
-                    foreach (ulong NodeID in relation.StoppingNodeIDs)
+                    try
                     {
-                        try
-                        {
-                            nodes[NodeID].TransportLines.Add(relation.Name);
-                            relation.StationNames.Add(nodes[NodeID].StationName);
-                        }
-                        catch (KeyNotFoundException)
-                        {
-                            continue;
-                        }
+                        nodes[NodeID].TransportLines.Add(relation.Name);
+                        relation.StationNames.Add(nodes[NodeID].Name);
+                    }
+                    catch (KeyNotFoundException)
+                    {
+                        continue;
                     }
                 }
             }
@@ -176,47 +147,10 @@ class MapReader
     /// <param name="r">XML node</param>
     void TagPublicTransportWays(OsmRelation r)
     {
-        foreach (ulong WayID in r.WayIDs)
-        {
-            try
-            {
-                switch (r.TransportType)
-                {
-                    case "subway":
-                        ways[WayID].TransportLines.Add(r.Name);
-                        ways[WayID].PublicTransportRailway = true;
-                        ways[WayID].TransportTypes.Add("subway");
-                        break;
-                    case "tram":
-                        ways[WayID].TransportLines.Add(r.Name);
-                        ways[WayID].PublicTransportRailway = true;
-                        ways[WayID].TransportTypes.Add("tram");
-                        break;
-                    case "train":
-                        ways[WayID].TransportLines.Add(r.Name);
-                        ways[WayID].PublicTransportRailway = true;
-                        ways[WayID].TransportTypes.Add("train");
-                        break;
-                    case "railway":
-                        ways[WayID].TransportLines.Add(r.Name);
-                        ways[WayID].PublicTransportRailway = true;
-                        ways[WayID].TransportTypes.Add("railway");
-                        break;
-                    case "light_rail":
-                        ways[WayID].TransportLines.Add(r.Name);
-                        ways[WayID].PublicTransportRailway = true;
-                        ways[WayID].TransportTypes.Add("light_rail");
-                        break;
-                    case "bus":
-                        ways[WayID].TransportLines.Add(r.Name);
-                        ways[WayID].PublicTransportStreet = true;
-                        ways[WayID].TransportTypes.Add("bus");
-                        break;
-                }
-            }
-            catch (KeyNotFoundException)
-            {
-                continue;
+        foreach (ulong WayID in r.WayIDs){
+            if(r.Route != null && ways.ContainsKey(WayID)){
+                ways[WayID].TransportLines.Add(r.Name);
+                ways[WayID].Routes.Add(r.Route.Value);
             }
         }
     }

@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 
 /*
     Copyright (c) 2020 Alen Smajic
@@ -32,32 +31,20 @@ using UnityEngine.SceneManagement;
 /// </summary>
 class MapBuilder : MonoBehaviour
 {
-    public GameObject StationPrefab; // Station objects.
-    public GameObject StationUIPrefab; // Station-UI.
-    public GameObject InGameLoadingScreen; // Shows the loading percentage.
-    public GameObject InGameLoadingMessage; // Shows loading message.
-    public GameObject InGameLoadingWindow; // Show loading windows.
-
     // Here are the various public transport colors stored which are used
     // upon generating the roads and railroads.
-    public Material bus_streets;
-    public Material public_transport_railways;
-    public Material subways;
-    public Material trams;
-    public Material trains;
-    public Material railway;
-    public Material light_rails;
+    [System.Serializable]
+    public class RouteEntry
+    {
+        public OsmRoute Type;
+        public Material RouteMaterial;
+        public Station StationPrefab;
+    }
+    public RouteEntry[] RouteMaterials;
     public static Material selected_way;
 
-    Material inUse;
-
-    bool StationsCreated = false;
-
-    // This is used for the loading percentage window.
-    float processed_items = 0f;
-    int percentageAmount = 0;
-
     OsmData osmData;
+    Dictionary<ulong, Station> createdStations = new Dictionary<ulong, Station>();
 
     /// <summary>
     /// This script will visualize osmData
@@ -67,61 +54,14 @@ class MapBuilder : MonoBehaviour
     {
         this.osmData = osmData;
 
-        if (!UserPreferences.Stations)
-        {
-            StationsCreated = true;
-        }
-        else
-        {
-            for (int i = 0; i < osmData.Relations.Count; i++)
-            {
-                switch (osmData.Relations[i].TransportType)
-                {
-                    case "subway":
-                        if (UserPreferences.Subways == true)
-                        {
-                            CreateStations(osmData.Relations[i]);
-                        }
-                        break;
-                    case "tram":
-                        if (UserPreferences.Trams == true)
-                        {
-                            CreateStations(osmData.Relations[i]);
-                        }
-                        break;
-                    case "train":
-                        if (UserPreferences.Trains == true)
-                        {
-                            CreateStations(osmData.Relations[i]);
-                        }
-                        break;
-                    case "railway":
-                        if (UserPreferences.Railways == true)
-                        {
-                            CreateStations(osmData.Relations[i]);
-                        }
-                        break;
-                    case "light_rail":
-                        if (UserPreferences.LightRails == true)
-                        {
-                            CreateStations(osmData.Relations[i]);
-                        }
-                        break;
-                    case "bus":
-                        if (UserPreferences.Busses == true)
-                        {
-                            CreateStations(osmData.Relations[i]);
-                        }
-                        break;
-                }
-                yield return null;
+        for(int i=0; i<osmData.Relations.Count; i++){
+            var relation = osmData.Relations[i];
+            if(relation.Route != null){
+                CreateStations(relation);
             }
         }
 
-        if (UserPreferences.PublicTransportRailways || UserPreferences.PublicTransportStreets)
-        {
-            StartCoroutine(WayBuilder()); // Roads and railroads are being instantiated.
-        }
+        yield return WayBuilder(); // Roads and railroads are being instantiated.
     }
 
     /// <summary>
@@ -130,108 +70,37 @@ class MapBuilder : MonoBehaviour
     /// </summary>
     /// <param name="r">relation instance</param>
     void CreateStations(OsmRelation r)
-    {
+    {       
         foreach (ulong NodeID in r.StoppingNodeIDs)
         {
-            GameObject station_object;
-            GameObject stationUI_object;
-
-            try
-            {
-                // If a station has already been created using a node position, a new station will not
-                // be created there but the existing one will be augmented with the new information. This 
-                // avoids the case of multiple overlapping station object at one point.
-                if (osmData.Nodes[NodeID].StationCreated == true)
-                {
-                    List<GameObject> allObjects = new List<GameObject>();
-                    Scene scene = SceneManager.GetActiveScene();
-                    scene.GetRootGameObjects(allObjects);
-
-                    // We iterate over all Unity objects to find the station that has
-                    // already been generated at the certain point.
-                    for (int i = 5; i < allObjects.Count; i++)
-                    {
-                        if (allObjects[i].transform.position == osmData.Nodes[NodeID] - osmData.Bounds.Centre)
-                        {
-                            bool doubleFound = false;
-
-                            // Here we check if the new information that is being added to the station object,
-                            // has not already been stored inside the station object. This operation can be traced
-                            // back to a bug which I encountered during development, where the same information
-                            // was stored multiple times. The reason for this is still unclear, this is a workaround.
-                            GameObject Dropdown = allObjects[i].transform.GetChild(0).transform.GetChild(0).transform.GetChild(2).gameObject;
-                            var dropOptions = Dropdown.GetComponent<Dropdown>();
-                            for (int j = 0; j < dropOptions.options.Count; j++)
-                            {
-                                for (int k = 0; k < osmData.Nodes[NodeID].TransportLines.Count; k++)
-                                {
-                                    if (dropOptions.options[j].text == osmData.Nodes[NodeID].TransportLines[k])
-                                    {
-                                        doubleFound = true;
-                                        continue;
-                                    }
-                                }
-                            }
-                            if (!doubleFound)  // If no information is found, we add the new information here.
-                            {
-                                dropOptions.AddOptions(osmData.Nodes[NodeID].TransportLines);
-                                if (r.TransportType == "bus")
-                                {
-                                    // Activates the bus symbol in the UI.
-                                    allObjects[i].transform.GetChild(0).GetChild(0).transform.GetChild(4).gameObject.SetActive(true);
-                                }
-                                else
-                                {
-                                    // Activates the train symbol on the UI.
-                                    allObjects[i].transform.GetChild(0).GetChild(0).transform.GetChild(5).gameObject.SetActive(true);
-                                }
-                                continue;
-                            }
-                        }
-                    }
-                    continue;
-                }
-
-                station_object = Instantiate(StationPrefab) as GameObject;
-                OsmNode new_station = osmData.Nodes[NodeID];
-                Vector3 new_station_position = new_station - osmData.Bounds.Centre;
-                station_object.transform.position = new_station_position;
-
-                // Is being set so that on this position, no new stations are being generated.
-                osmData.Nodes[NodeID].StationCreated = true;
-
-                var stationUI_position = new_station_position;
-                stationUI_position.y += 2;
-                stationUI_position.x += 2;
-                stationUI_object = Instantiate(StationUIPrefab) as GameObject;
-                stationUI_object.transform.position = stationUI_position;
-                stationUI_object.transform.SetParent(station_object.transform.GetChild(0));
-                stationUI_object.GetComponent<Canvas>().renderMode = RenderMode.WorldSpace;
-                stationUI_object.transform.localPosition = new Vector3(-1, 10, 0);
-
-                GameObject station_text = stationUI_object.transform.GetChild(1).gameObject;
-                Text OnScreenText = station_text.GetComponent<Text>();
-                OnScreenText.text = osmData.Nodes[NodeID].StationName;
-
-                GameObject TransportLineDropdown = stationUI_object.transform.GetChild(2).gameObject;
-                var dropDownOptions = TransportLineDropdown.GetComponent<Dropdown>();
-                dropDownOptions.AddOptions(osmData.Nodes[NodeID].TransportLines);
-
-                if (r.TransportType == "bus")
-                {
-                    // Activates the bus symbol on the UI.
-                    stationUI_object.transform.GetChild(4).gameObject.SetActive(true);
-                }
-                else
-                {
-                    // Activates the train symbol on the UI.
-                    stationUI_object.transform.GetChild(5).gameObject.SetActive(true);
-                }
-            }
-            catch (KeyNotFoundException)
-            {
+            if(!osmData.Nodes.ContainsKey(NodeID)){
                 continue;
             }
+
+            OsmNode stationNode = osmData.Nodes[NodeID];
+
+            Station stationPrefab = null;
+            foreach(var entry in RouteMaterials){
+                if(r.Route == entry.Type){
+                    stationPrefab = entry.StationPrefab;
+                    break;
+                }
+            }
+
+            if(stationPrefab == null) continue;
+
+            Station station;
+            if (createdStations.ContainsKey(NodeID)) station = createdStations[NodeID];
+            else {
+                station = Instantiate(stationPrefab);
+                station.transform.position = stationNode - osmData.Bounds.Centre;
+                station.SetName(stationNode.Name);
+
+                createdStations.Add(NodeID, station);
+            }
+
+            station.AddTransportLines(stationNode.TransportLines);
+
         }
     }
 
@@ -242,86 +111,18 @@ class MapBuilder : MonoBehaviour
     /// <returns></returns>
     IEnumerator WayBuilder()
     {
-        float TargetCount = osmData.Ways.Count;
-        Text PercentageDisplayer = InGameLoadingScreen.GetComponent<Text>();
-
-        InGameLoadingWindow.SetActive(true);
-
         foreach (KeyValuePair<ulong, OsmWay> w in osmData.Ways)
         {
-            // A simple loading progress logic, which returns the amount
-            // of processed items divided by the total number of items.
-            processed_items += 1;
-            float loadingPercentage = processed_items / TargetCount * 100;
-
-            if (loadingPercentage < 99)
-            {
-                if (loadingPercentage > percentageAmount)
-                {
-                    percentageAmount += 1;
-                    PercentageDisplayer.text = percentageAmount.ToString() + "%";
+            Material material = null;
+            foreach(var entry in RouteMaterials){
+                if(w.Value.Routes.Contains(entry.Type)){
+                    material = entry.RouteMaterial;
+                    break;
                 }
-            }
-            else
-            {
-                InGameLoadingScreen.SetActive(false);
-                InGameLoadingMessage.SetActive(false);
-                InGameLoadingWindow.SetActive(false);
             }
 
-            if (w.Value.PublicTransportStreet && !UserPreferences.PublicTransportStreets) continue;
-            if (w.Value.PublicTransportRailway && !UserPreferences.PublicTransportRailways) continue;
-            if (w.Value.PublicTransportRailway)
-            {
-                if (w.Value.TransportTypes.Contains("subway") && !UserPreferences.Subways) continue;
-                if (w.Value.TransportTypes.Contains("tram") && !UserPreferences.Trams) continue;
-                if (w.Value.TransportTypes.Contains("train") && !UserPreferences.Trains) continue;
-                if (w.Value.TransportTypes.Contains("railway") && !UserPreferences.Railways) continue;
-                if (w.Value.TransportTypes.Contains("light_rail") && !UserPreferences.LightRails) continue;
-            }
-
-            // Here we start the process of road/rail road instantiation.
-            if (w.Value.PublicTransportStreet)
-            {
-                inUse = bus_streets;
-            }
-            else if (w.Value.PublicTransportRailway)
-            {
-
-                if (!UserPreferences.Subways && !UserPreferences.Trams && !UserPreferences.Trains && !UserPreferences.Railways && !UserPreferences.LightRails)
-                {
-                    inUse = public_transport_railways;
-                }
-                else if (w.Value.TransportTypes.Contains("subway"))
-                {
-                    inUse = subways;
-                }
-                else if (w.Value.TransportTypes.Contains("tram"))
-                {
-                    inUse = trams;
-                }
-                else if (w.Value.TransportTypes.Contains("train"))
-                {
-                    inUse = trains;
-                }
-                else if (w.Value.TransportTypes.Contains("railway"))
-                {
-                    inUse = railway;
-                }
-                else if (w.Value.TransportTypes.Contains("light_rail"))
-                {
-                    inUse = light_rails;
-                }
-                else
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                continue;
-            }
-
+            if(!material) continue;
+                                             
             GameObject go = new GameObject();
             var waytext = go.AddComponent<Text>();
             foreach (string tramline in w.Value.TransportLines)
@@ -329,16 +130,16 @@ class MapBuilder : MonoBehaviour
                 waytext.text += tramline + ", ";
             }
             Vector3 localOrigin = GetCentre(w.Value);
-            go.transform.position = (localOrigin - osmData.Bounds.Centre) + Vector3.up * 10;
+            go.transform.position = (localOrigin - osmData.Bounds.Centre) + Vector3.up*0.1f;
 
 
             MeshFilter mf = go.AddComponent<MeshFilter>();
             MeshRenderer mr = go.AddComponent<MeshRenderer>();
 
-            mr.material = inUse;
+            mr.material = material;
 
             // Here we store the vectors, normales and indexes.
-            List<Vector3> vectors = new List<Vector3>();
+            List<Vector3> vectors = new List<Vector3>();  
             List<Vector3> normals = new List<Vector3>();
             List<int> indicies = new List<int>();
 
@@ -347,25 +148,25 @@ class MapBuilder : MonoBehaviour
                 OsmNode p1 = osmData.Nodes[w.Value.NodeIDs[i - 1]];
                 OsmNode p2 = osmData.Nodes[w.Value.NodeIDs[i]];
 
-                Vector3 s1 = p1 - localOrigin;
+                Vector3 s1 = p1 - localOrigin;  
                 Vector3 s2 = p2 - localOrigin;
 
                 Vector3 diff = (s2 - s1).normalized;
 
                 // The width of road and railroads is set to 1 meter.
-                var cross = Vector3.Cross(diff, Vector3.up) * 1.0f;
+                var cross = Vector3.Cross(diff, Vector3.up) * 1.0f; 
 
                 Vector3 v1 = s1 + cross;
                 Vector3 v2 = s1 - cross;
                 Vector3 v3 = s2 + cross;
                 Vector3 v4 = s2 - cross;
 
-                vectors.Add(v1);
+                vectors.Add(v1);  
                 vectors.Add(v2);
                 vectors.Add(v3);
                 vectors.Add(v4);
 
-                normals.Add(Vector3.up);
+                normals.Add(Vector3.up);  
                 normals.Add(Vector3.up);
                 normals.Add(Vector3.up);
                 normals.Add(Vector3.up);
@@ -393,7 +194,7 @@ class MapBuilder : MonoBehaviour
 
             // Lastly we store the Unity coordinates of every generated way. This is then used later on
             // when we want to move the transport vehicles across the ways.
-            for (int i = 0; i < w.Value.NodeIDs.Count; i++)
+            for(int i = 0; i < w.Value.NodeIDs.Count; i++)
             {
                 OsmNode p1 = osmData.Nodes[w.Value.NodeIDs[i]];
                 w.Value.UnityCoordinates.Add(p1 - osmData.Bounds.Centre);
@@ -407,14 +208,14 @@ class MapBuilder : MonoBehaviour
     /// </summary>
     /// <param name="way">way instance</param>
     /// <returns></returns>
-    protected Vector3 GetCentre(OsmWay way)
+    protected Vector3 GetCentre(OsmWay way)  
     {
         Vector3 total = Vector3.zero;
 
         foreach (var id in way.NodeIDs)
         {
-            total += osmData.Nodes[id];
+            total += osmData.Nodes[id];  
         }
         return total / way.NodeIDs.Count;
-    }
+    }  
 }

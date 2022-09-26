@@ -7,6 +7,15 @@ public class VehicleTransportLineManager : NetworkBehaviour
 {
     public NetworkVariable<bool> darkmodeEnabled = new NetworkVariable<bool>(false);
 
+   [System.Serializable]
+   public class VehicleEntry
+   {
+       public Vehicle.VehicleType type;
+       public Vehicle.Vehicle vehicle;
+   }
+
+   public VehicleEntry[] vehiclePrefabs;    
+
     NetworkVariable<Vehicle.VehicleType> vehicleType = new NetworkVariable<Vehicle.VehicleType>(Vehicle.VehicleType.Bus);
     // FIXME: Setting NetworkList imediatly throws error, but it continues to work (https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/1367)
     //        setting it in Start Method fixes that, but that breaks client
@@ -17,8 +26,7 @@ public class VehicleTransportLineManager : NetworkBehaviour
     NetworkVariable<int> waypointIndex = new NetworkVariable<int>(1); // skip first point
     NetworkVariable<Vector3> vehiclePosition = new NetworkVariable<Vector3>(new Vector3());
 
-    GameObject vehicleGameObject;
-    Vehicle.IVehicle vehicle;
+    Vehicle.Vehicle vehicle;
     Vehicle.Transporter transporter;
 
 
@@ -35,40 +43,25 @@ public class VehicleTransportLineManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         spawnVehicle();
-        if(IsOwner) StartCoroutine(updateVehiclePosition());
-        else StartCoroutine(clientUpdateVehiclePosition());
+        StartCoroutine(updateVehiclePosition());
     }
 
     void spawnVehicle()
     {
-
-        var vehicleName = "";
-        if(vehicleType.Value == Vehicle.VehicleType.Bus) vehicleName = "Bus";
-        if(vehicleType.Value == Vehicle.VehicleType.Subway) vehicleName = "Subway";
-        if(vehicleType.Value == Vehicle.VehicleType.Train) vehicleName = "Train";
-        if(vehicleType.Value == Vehicle.VehicleType.Tram) vehicleName = "Tram";
-
-        if(vehicleType.Value == Vehicle.VehicleType.Bus)
-        {
-            vehicleGameObject = Instantiate(Resources.Load("Vehicles/Prefabs/" + vehicleName)) as GameObject; // Instantiate bus vehicle.
-            vehicle = vehicleGameObject.AddComponent<Vehicle.StreetVehicle>();
-        }
-        else
-        {
-            vehicleGameObject = Instantiate(Resources.Load("Vehicles/Prefabs/" + vehicleName)) as GameObject; // Instantiate leading wagon of train vehicle.
-            var multiSegmentRailVehicle = vehicleGameObject.AddComponent<Vehicle.MultiSegmentRailVehicle>();
-            for(int i = 0; i < 4; i++){
-                var wagon = Instantiate(Resources.Load("Vehicles/Prefabs/" + vehicleName + " Wagon")) as GameObject; // Instantiate other wagons of train vehicle.
-                multiSegmentRailVehicle.AddSegment(wagon);
+        foreach(var entry in vehiclePrefabs){
+            if(entry.type == vehicleType.Value){
+                vehicle = Instantiate(entry.vehicle);
+                transporter = vehicle.gameObject.GetComponent<Vehicle.Transporter>();
+                break;
             }
-            vehicle = multiSegmentRailVehicle;
+        }
+
+        if(!vehicle){
+            throw new System.Exception("missing vehiclePrefab for: " + vehicleType.Value);
         }
 
         vehicle.SetPosition(wayPoints[0]);
         vehicle.EnableLights(darkmodeEnabled.Value);
-
-        // add transporter script
-        transporter = vehicleGameObject.AddComponent<Vehicle.Transporter>();
     }
 
     IEnumerator updateVehiclePosition()
@@ -79,40 +72,35 @@ public class VehicleTransportLineManager : NetworkBehaviour
             // move vehicle
             vehicle.SetPosition(vehiclePosition.Value); // this is neccessary to set correct position for late joining clients
             yield return vehicle.MoveTo(targetPoint);
-            vehiclePosition.Value = vehicle.GetPosition();
 
             // wait on station
             if (stationPoints.Contains(targetPoint)){
-                transporter.StopTransporting();
+                if(transporter && transporter.stopTransportingOnNextHalt){
+                    transporter.StopTransporting();
+                }
                 yield return new WaitForSeconds(2f);
             }
 
-            // jump over gaps in path
-            if (lastNodePoints.Contains(targetPoint) && waypointIndex.Value < wayPoints.Count-1){
-                vehiclePosition.Value = wayPoints[waypointIndex.Value+1];
-            }
+            if(IsOwner){
+                vehiclePosition.Value = vehicle.GetPosition();
 
-            waypointIndex.Value++;
+                // jump over gaps in path
+                if (lastNodePoints.Contains(targetPoint) && waypointIndex.Value < wayPoints.Count-1){
+                    vehiclePosition.Value = wayPoints[waypointIndex.Value+1];
+                }
+
+                waypointIndex.Value++;
+            }
         }
 
         // route finished => destroy lineManager
         gameObject.Destroy();
     }
 
-    IEnumerator clientUpdateVehiclePosition()
-    {
-        while(true){
-            vehicle.SetPosition(vehiclePosition.Value);
-            var targetPoint = wayPoints[waypointIndex.Value];
-            yield return vehicle.MoveTo(targetPoint);
-        }
-
-    }
-
     void OnDestroy()
     {
-        if(vehicleGameObject){
-            vehicleGameObject.Destroy();
+        if(vehicle){
+            vehicle.gameObject.Destroy();
         }
     }
 }

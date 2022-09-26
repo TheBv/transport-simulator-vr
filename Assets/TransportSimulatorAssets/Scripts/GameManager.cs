@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEditor;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using System.Collections;
@@ -13,7 +12,7 @@ public class GameManager : NetworkBehaviour
 
     public string ServerIp = "127.0.0.1";
     public ushort ServerPort = 7777;
-    public TextAsset osmMapDataFile;
+    public string osmMapDataFilePath = "";
 
     public GameObject Lobby; // LobbyArea
     public GameObject mapBuilder;
@@ -52,7 +51,7 @@ public class GameManager : NetworkBehaviour
     {
         // read osm data
         var osmReader = new MapReader();
-        var osmData = osmReader.ParseOsmData(AssetDatabase.GetAssetPath(osmMapDataFile));
+        var osmData = osmReader.ParseOsmData(osmMapDataFilePath);
         StartCoroutine(mapBuilder.GetComponent<MapBuilder>().BuildAllObjects(osmData));
 
         // configure mapBoxMap
