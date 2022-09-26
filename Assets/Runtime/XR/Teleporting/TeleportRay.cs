@@ -108,8 +108,6 @@ namespace Ubiq.XR
 
                 if (Physics.Linecast(positions[i-1], positions[i], out raycasthitinfo))
                 {
-                    Debug.Log(raycasthitinfo.collider.gameObject.layer);
-                    Debug.Log(LayerMask.NameToLayer("teleport"));
                     if (raycasthitinfo.collider.CompareTag("Teleport") || raycasthitinfo.collider.gameObject.layer == LayerMask.NameToLayer("teleport"))
                     {
                         positions[i] = raycasthitinfo.point;
